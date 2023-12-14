@@ -10,7 +10,11 @@ import org.springframework.stereotype.Component;
 @Order
 public class Pointcuts {
 
-    @Pointcut("execution(* com.example.blog.*.adapter.*.*(..))")
-    public void controller() {
+    @Pointcut("execution(* com.example.blog.*.adapter.*(..))")
+    public void handler() {
+    }
+
+    @Pointcut("execution(* com.example.blog.*.service.*(..))")
+    public void service() {
     }
 }

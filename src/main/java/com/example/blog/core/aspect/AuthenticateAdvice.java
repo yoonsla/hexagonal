@@ -27,7 +27,7 @@ public class AuthenticateAdvice {
     private final HttpServletRequest httpRequest;
     private final ParseTokenClaim parseTokenClaim;
 
-    @Before("com.example.blog.core.aspect.Pointcuts.controller()")
+    @Before("com.example.blog.core.aspect.Pointcuts.handler()")
     public void checkBeforeController(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
