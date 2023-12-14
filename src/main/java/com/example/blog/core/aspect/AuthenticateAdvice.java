@@ -11,27 +11,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Component
 @Aspect
+@Order
 public class AuthenticateAdvice {
 
     private final HttpServletRequest httpRequest;
     private final ParseTokenClaim parseTokenClaim;
 
-    @Pointcut("execution(* com.example.blog.*.adapter.*.*(..))")
-    public void controller() {
-    }
-
-    @Before("controller()")
+    @Before("com.example.blog.core.aspect.Pointcuts.controller()")
     public void checkBeforeController(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
@@ -76,5 +72,4 @@ public class AuthenticateAdvice {
         httpRequest.setAttribute("name", accessClaim.getEmail());
         httpRequest.setAttribute("role", accessClaim.getRole());
     }
-
 }
