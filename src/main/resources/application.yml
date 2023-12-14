@@ -1,0 +1,7 @@
+jwt:
+  access-token-hour: 2      # hour
+  refresh-token-day: 14     # day
+  info:
+    iss: blog-svc
+    sub: atoken
+    aud: ""

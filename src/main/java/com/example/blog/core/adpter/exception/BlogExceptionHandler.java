@@ -1,4 +1,4 @@
-package com.example.blog.core.adpter;
+package com.example.blog.core.adpter.exception;
 
 import com.example.blog.core.adpter.response.Response;
 import com.example.blog.core.exception.BlogException;
