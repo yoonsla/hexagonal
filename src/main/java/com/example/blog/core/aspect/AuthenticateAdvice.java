@@ -4,9 +4,11 @@ import static com.example.blog.core.contants.Constants.HEADER_AUTHORIZATION;
 
 import com.example.blog.core.annotation.dto.AnnotationDto;
 import com.example.blog.core.client.ParseTokenClaim;
+import com.example.blog.core.client.TokenStore;
 import com.example.blog.core.contants.ResponseCode;
 import com.example.blog.core.exception.BlogException;
 import com.example.blog.core.infrastructure.dto.AccessClaim;
+import com.example.blog.core.service.dto.AccessToken;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class AuthenticateAdvice {
 
     private final HttpServletRequest httpRequest;
     private final ParseTokenClaim parseTokenClaim;
+    private final TokenStore tokenStore;
 
     @Before("com.example.blog.core.aspect.Pointcuts.handler()")
     public void checkBeforeController(JoinPoint joinPoint) {
@@ -40,13 +43,14 @@ public class AuthenticateAdvice {
             return;
         }
         String accessToken = httpRequest.getHeader(HEADER_AUTHORIZATION);
+        AccessClaim accessClaim = parseTokenClaim.accessToken(accessToken);
         // token 유효성 검사
-        checkTokenValid(accessToken);
+        checkTokenValid(accessToken, accessClaim);
         // 유저 유효성 검사
-        checkUserValid(annotationDto, accessToken);
+        checkUserValid(annotationDto, accessClaim);
     }
 
-    private void checkTokenValid(String accessToken) {
+    private void checkTokenValid(String accessToken, AccessClaim accessClaim) {
         // token 여부 검사
         if (!StringUtils.hasText(accessToken)) {
             throw new BlogException(ResponseCode.INVALID_ACCESS_TOKEN);
@@ -55,10 +59,14 @@ public class AuthenticateAdvice {
         if (parseTokenClaim.isTokenExpired(accessToken)) {
             throw new BlogException(ResponseCode.INVALID_ACCESS_TOKEN);
         }
+        // redis 저장 정보와 header token 이 같은지 비교
+        AccessToken redisToken = tokenStore.getToken(accessClaim.getEmail());
+        if (!redisToken.getToken().equals(accessToken)) {
+            throw new BlogException(ResponseCode.INVALID_ACCESS_TOKEN);
+        }
     }
 
-    private void checkUserValid(AnnotationDto annotationDto, String accessToken) {
-        AccessClaim accessClaim = parseTokenClaim.accessToken(accessToken);
+    private void checkUserValid(AnnotationDto annotationDto, AccessClaim accessClaim) {
         boolean isAdmin = annotationDto.isAdminCallable();
         if (isAdmin && accessClaim.getRole().isUser()) {
             throw new BlogException(ResponseCode.USER_ROLE_MISMATCH);

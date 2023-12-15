@@ -3,6 +3,7 @@ package com.example.blog.core.infrastructure;
 import com.example.blog.core.client.TokenStore;
 import com.example.blog.core.infrastructure.dto.TokenType;
 import com.example.blog.core.service.RedisTokenService;
+import com.example.blog.core.service.dto.AccessToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -27,5 +28,10 @@ public class RedisTokenStore implements TokenStore {
     @Override
     public void delete(String email) {
         redisTokenService.deleteToken(email);
+    }
+
+    @Override
+    public AccessToken getToken(String email) {
+        return redisTokenService.getToken(email);
     }
 }

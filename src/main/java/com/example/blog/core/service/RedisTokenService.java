@@ -31,4 +31,9 @@ public class RedisTokenService {
         accessTokenRepository.deleteById(email);
         refreshTokenRepository.deleteById(email);
     }
+
+    public AccessToken getToken(String email) {
+        return accessTokenRepository.findById(email)
+            .orElseThrow(() -> new BlogException(ResponseCode.INVALID_ACCESS_TOKEN));
+    }
 }
